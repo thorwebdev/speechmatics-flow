@@ -1,0 +1,86 @@
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./index.js"></script>
+</head>
+
+<body>
+  <main class="w-screen h-screen hero">
+    <div class="flex flex-col justify-center items-center gap-2 w-full p-5">
+      <table>
+        <tr>
+          <td>
+            <div class="text-2xl font-bold">Flow Skeleton</div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- persona selection dropdown -->
+      <div>
+        <select
+          id="persona-dropdown"
+          class="select select-bordered w-full max-w-xs"
+        >
+          <option value="">Select a Persona</option>
+        </select>
+      </div>
+
+      <!-- session control button -->
+      <div class="flex flex-row items-center">
+        <div>
+          <button
+            id="session-button"
+            class="bg-cyan-600 py-2 px-3 rounded text-white"
+          >
+            START
+          </button>
+        </div>
+
+        <div class="ml-3">
+          <button
+            id="session-button-force-stop"
+            class="bg-rose-500 py-2 px-3 rounded text-white"
+            style="display: none"
+          >
+            Force STOP
+          </button>
+        </div>
+      </div>
+
+      <!-- session status -->
+      <div
+        class="border rounded-2xl p-5 text-xs"
+        style="width: 100%; max-width: 400px"
+      >
+        <table class="table-auto">
+          <tr>
+            <td>Status:</td>
+            <td id="status" class="font-bold"></td>
+          </tr>
+          <tr>
+            <td>Session ID:</td>
+            <td id="session-id" class="font-mono"></td>
+          </tr>
+          <tr>
+            <td>Passive Mode:</td>
+            <td id="passive-state" class="font-bold">False</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- emoji -->
+      <div class="flex flex-col items-center justify-center">
+        <div class="text-8xl" id="emoji"></div>
+        <div class="italic" id="emotion"></div>
+      </div>
+
+      <!-- prompts -->
+      <div
+        class="border rounded-2xl p-5 flex flex-col gap-2 overflow-scroll"
+        style="width: 100%; max-width: 600px; height: 30rem"
+        id="prompts"
+      ></div>
+    </div>
+  </main>
+</body>

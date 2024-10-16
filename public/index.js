@@ -137,7 +137,7 @@ async function fetchJWTToken() {
       method: "post",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer <YOUR_API_KEY>" //Change this before adding to docs as my personal token!!
+        "Authorization": `Bearer ${YOUR_API_KEY}` //Change this before adding to docs as my personal token!!
       },
       body: JSON.stringify({
         "ttl": 500,
@@ -244,6 +244,7 @@ function handleMessageUpdate(data) {
     case "ConversationStarted":
       console.log('received ConversationStarted', data);
       updateStatus("running");
+      updateSessionId(data.id);
       break;
     case "ConversationEnded":
       if (state.ws.readyState === WebSocket.OPEN) {

@@ -1,4 +1,4 @@
-const YOUR_API_KEY = 'YOUR_API_KEY';
+const YOUR_API_KEY = '790UTOwu1UJLWs6jhqM2BAn8kWCzfw5n';
 // State management
 const state = {
   running: false,
@@ -188,6 +188,10 @@ function sendStartConversationMessage(presetId) {
     conversation_config: {
       template_id: presetId,
       template_variables: {
+        persona: 'You are an aging English rock star named Roger Godfrey.',
+        style:
+          "Be helpful, but don't interrupt while contestants are thinking what's in the bag!",
+        context: `You're a game show host for the popular memory game "I packed my bag". Make sure the order of items is correct. Ask how many contestants are playing, and ask for their names. Then start the game!`,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
     },

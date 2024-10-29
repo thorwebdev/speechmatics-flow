@@ -1,8 +1,8 @@
-const YOUR_API_KEY = "YOUR_API_KEY"
+const YOUR_API_KEY = 'YOUR_API_KEY';
 // State management
 const state = {
   running: false,
-  flowStatus: "disconnected",
+  flowStatus: 'disconnected',
   audioContext: null,
   mediaStream: null,
   processor: null,
@@ -11,7 +11,7 @@ const state = {
   prompts: [],
   audioSequence: 0,
   audioChunkQueue: [],
-  isReading: false
+  isReading: false,
 };
 
 // DOM elements
@@ -22,36 +22,36 @@ const elements = {
   statusDiv: null,
   sessionIdDiv: null,
   passiveStateSpan: null,
-  promptsDiv: null
+  promptsDiv: null,
 };
 
-document.addEventListener("DOMContentLoaded", initializeApp);
+document.addEventListener('DOMContentLoaded', initializeApp);
 
 function initializeApp() {
   cacheElements();
-  updateStatus("disconnected");
+  updateStatus('disconnected');
   fetchPersonas(elements.dropdown);
   addEventListeners();
 
-  console.log(YOUR_API_KEY)
-  if (YOUR_API_KEY === "YOUR_API_KEY") {
-    alert("Don't forget to set YOUR_API_KEY in index.js!")
+  console.log(YOUR_API_KEY);
+  if (YOUR_API_KEY === 'YOUR_API_KEY') {
+    alert("Don't forget to set YOUR_API_KEY in index.js!");
   }
 }
 
 function cacheElements() {
-  elements.button = document.getElementById("session-button");
-  elements.buttonForce = document.getElementById("session-button-force-stop");
-  elements.dropdown = document.getElementById("persona-dropdown");
-  elements.statusDiv = document.getElementById("status");
-  elements.sessionIdDiv = document.getElementById("session-id");
-  elements.passiveStateSpan = document.getElementById("passive-state");
-  elements.promptsDiv = document.getElementById("prompts");
+  elements.button = document.getElementById('session-button');
+  elements.buttonForce = document.getElementById('session-button-force-stop');
+  elements.dropdown = document.getElementById('persona-dropdown');
+  elements.statusDiv = document.getElementById('status');
+  elements.sessionIdDiv = document.getElementById('session-id');
+  elements.passiveStateSpan = document.getElementById('passive-state');
+  elements.promptsDiv = document.getElementById('prompts');
 }
 
 function addEventListeners() {
-  elements.button.addEventListener("click", toggleSession);
-  elements.buttonForce.addEventListener("click", forceStopSession);
+  elements.button.addEventListener('click', toggleSession);
+  elements.buttonForce.addEventListener('click', forceStopSession);
 }
 
 function toggleSession() {
@@ -59,23 +59,23 @@ function toggleSession() {
     const presetId = elements.dropdown.value;
     if (presetId) {
       startSession(presetId);
-      elements.button.textContent = "STOP";
-      elements.buttonForce.style.display = "block";
+      elements.button.textContent = 'STOP';
+      elements.buttonForce.style.display = 'block';
     } else {
-      alert("Please select a persona.");
+      alert('Please select a persona.');
     }
   } else {
     stopSession(false);
-    elements.button.textContent = "START";
-    elements.buttonForce.style.display = "none";
+    elements.button.textContent = 'START';
+    elements.buttonForce.style.display = 'none';
   }
   state.running = !state.running;
 }
 
 function forceStopSession() {
   if (state.running) {
-    elements.button.textContent = "START";
-    elements.buttonForce.style.display = "none";
+    elements.button.textContent = 'START';
+    elements.buttonForce.style.display = 'none';
     stopSession(true);
   }
   state.running = false;
@@ -87,7 +87,7 @@ function fetchPersonas(dropdown) {
     { label: 'Amelia', value: 'flow-service-assistant-amelia' },
     { label: 'Humphrey', value: 'flow-service-assistant-humphrey' },
   ];
-  personaOptions.forEach(option => {
+  personaOptions.forEach((option) => {
     const optionElement = document.createElement('option');
     optionElement.value = option.value;
     optionElement.textContent = option.label;
@@ -106,8 +106,8 @@ async function startSession(presetId) {
 
     setupWebSocket(presetId);
   } catch (error) {
-    alert("Unable to access the microphone.");
-    console.error("Error accessing microphone:", error);
+    alert('Unable to access the microphone.');
+    console.error('Error accessing microphone:', error);
   }
 }
 
@@ -133,16 +133,19 @@ async function setupAudioStream() {
 
 async function fetchJWTToken() {
   try {
-    const response = await fetch("https://mp.speechmatics.com/v1/api_keys?type=flow", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${YOUR_API_KEY}` //Change this before adding to docs as my personal token!!
-      },
-      body: JSON.stringify({
-        "ttl": 500,
-      })
-    })
+    const response = await fetch(
+      'https://mp.speechmatics.com/v1/api_keys?type=flow',
+      {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${YOUR_API_KEY}`, //Change this before adding to docs as my personal token!!
+        },
+        body: JSON.stringify({
+          ttl: 500,
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -161,37 +164,37 @@ async function setupWebSocket(presetId) {
   if (!jwt) {
     throw new Error('JWT token not found');
   }
-  const wsUrl = new URL("/v1/flow", "wss://flow.api.speechmatics.com");
-  wsUrl.searchParams.append("jwt", jwt);
+  const wsUrl = new URL('/v1/flow', 'wss://flow.api.speechmatics.com');
+  wsUrl.searchParams.append('jwt', jwt);
   state.ws = new WebSocket(wsUrl.toString());
 
   state.ws.onopen = () => handleWebSocketOpen(presetId);
   state.ws.onmessage = handleWebSocketMessage;
   state.ws.onerror = handleWebSocketError;
   state.ws.onclose = handleWebSocketClose;
-  
+
   state.processor.onaudioprocess = handleAudioProcess;
 }
 
 function handleWebSocketOpen(presetId) {
-  console.log("WebSocket connected");
-  updateStatus("starting");
+  console.log('WebSocket connected');
+  updateStatus('starting');
   sendStartConversationMessage(presetId);
 }
 
 function sendStartConversationMessage(presetId) {
   const message = {
-    message: "StartConversation",
+    message: 'StartConversation',
     conversation_config: {
       template_id: presetId,
       template_variables: {
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-      }
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
     },
     audio_format: {
-      type: "raw",
-      encoding: "pcm_s16le",
-      sample_rate: 16000
+      type: 'raw',
+      encoding: 'pcm_s16le',
+      sample_rate: 16000,
     },
   };
   state.ws.send(JSON.stringify(message));
@@ -214,7 +217,7 @@ function handleAudioMessage(blob) {
 
 function handleJsonMessage(data) {
   if (data.audio) {
-    data.audio.forEach(frame => playAudio(frame, state.audioContext));
+    data.audio.forEach((frame) => playAudio(frame, state.audioContext));
   }
   if (data.event && data.event.sessionId) {
     updateSessionId(data.event.sessionId);
@@ -232,23 +235,23 @@ function handleJsonMessage(data) {
 
 function handleMessageUpdate(data) {
   switch (data.message) {
-    case "Info":
-      if (data.type === "status_update" && data.event && data.event.status) {
+    case 'Info':
+      if (data.type === 'status_update' && data.event && data.event.status) {
         updateStatus(data.event.status);
       }
       break;
-    case "Warning":
-    case "Error":
+    case 'Warning':
+    case 'Error':
       console.log(data);
       break;
-    case "ConversationStarted":
+    case 'ConversationStarted':
       console.log('received ConversationStarted', data);
-      updateStatus("running");
+      updateStatus('running');
       updateSessionId(data.id);
       break;
-    case "ConversationEnded":
+    case 'ConversationEnded':
       if (state.ws.readyState === WebSocket.OPEN) {
-        console.log("Closing session on ConversationEnded", data);
+        console.log('Closing session on ConversationEnded', data);
         closeWebSocket();
       }
       break;
@@ -256,19 +259,22 @@ function handleMessageUpdate(data) {
 }
 
 function handleWebSocketError(error) {
-  console.error("WebSocket error:", error);
+  console.error('WebSocket error:', error);
 }
 
 function handleWebSocketClose() {
-  console.log("WebSocket closed");
-  updateStatus("disconnected");
+  console.log('WebSocket closed');
+  updateStatus('disconnected');
 }
 
 function handleAudioProcess(event) {
   const inputBuffer = event.inputBuffer.getChannelData(0);
   const pcm16Array = float32ToPcm16(inputBuffer);
 
-  if (state.flowStatus === "running" && state.ws.readyState === WebSocket.OPEN) {
+  if (
+    state.flowStatus === 'running' &&
+    state.ws.readyState === WebSocket.OPEN
+  ) {
     state.ws.send(pcm16Array.buffer);
     state.audioSequence++;
   }
@@ -277,14 +283,14 @@ function handleAudioProcess(event) {
 function stopSession(force) {
   if (state.ws) {
     const endMessage = {
-      message: "AudioEnded",
-      last_seq_no: state.audioSequence
+      message: 'AudioEnded',
+      last_seq_no: state.audioSequence,
     };
-    console.log("Sending AudioEnded: ", endMessage);
+    console.log('Sending AudioEnded: ', endMessage);
     state.ws.send(JSON.stringify(endMessage));
 
     if (force) {
-      console.log("Closing session - forced");
+      console.log('Closing session - forced');
       closeWebSocket();
     }
   }
@@ -293,7 +299,7 @@ function stopSession(force) {
 function closeWebSocket() {
   state.ws.close();
   if (state.mediaStream) {
-    state.mediaStream.getTracks().forEach(track => track.stop());
+    state.mediaStream.getTracks().forEach((track) => track.stop());
   }
   if (state.processor) {
     state.processor.disconnect();
@@ -313,11 +319,13 @@ function updateSessionId(sessionId) {
 }
 
 function updatePassiveState(passive) {
-  elements.passiveStateSpan.textContent = passive ? "True" : "False";
+  elements.passiveStateSpan.textContent = passive ? 'True' : 'False';
 }
 
 function addPrompt(prompt) {
-  const existingPromptIndex = state.prompts.findIndex(p => p.id === prompt.id);
+  const existingPromptIndex = state.prompts.findIndex(
+    (p) => p.id === prompt.id
+  );
   if (existingPromptIndex !== -1) {
     state.prompts[existingPromptIndex] = prompt;
   } else {
@@ -327,15 +335,15 @@ function addPrompt(prompt) {
 }
 
 function updatePrompts() {
-  elements.promptsDiv.innerHTML = "";
-  state.prompts.forEach(p => {
-    const promptDiv = document.createElement("div");
-    promptDiv.className = "text-right pl-10";
+  elements.promptsDiv.innerHTML = '';
+  state.prompts.forEach((p) => {
+    const promptDiv = document.createElement('div');
+    promptDiv.className = 'text-right pl-10';
     promptDiv.innerHTML = escapeHTML(p.prompt);
     elements.promptsDiv.appendChild(promptDiv);
 
-    const responseDiv = document.createElement("div");
-    responseDiv.className = "italic pr-10";
+    const responseDiv = document.createElement('div');
+    responseDiv.className = 'italic pr-10';
     responseDiv.innerHTML = escapeHTML(p.response);
     elements.promptsDiv.appendChild(responseDiv);
   });
@@ -418,7 +426,7 @@ const float32ToPcm16 = (float32Array) => {
  */
 const pcm16ToBase64 = (int16AudioData) => {
   const uint8AudioData = new Uint8Array(int16AudioData.buffer);
-  let binaryString = "";
+  let binaryString = '';
   uint8AudioData.forEach((byte) => {
     binaryString += String.fromCharCode(byte);
   });
@@ -447,10 +455,9 @@ const base64ToArrayBuffer = (base64) => {
  */
 const escapeHTML = (unsafe) => {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 };
-

@@ -1,4 +1,6 @@
-const YOUR_API_KEY = '790UTOwu1UJLWs6jhqM2BAn8kWCzfw5n';
+// This is only for local testing. 
+// Do not expose your API_KEY on the client side in production apps!
+const YOUR_API_KEY = 'YOUR_API_KEY';
 // State management
 const state = {
   running: false,
